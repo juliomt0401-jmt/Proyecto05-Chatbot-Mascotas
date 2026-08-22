@@ -1,0 +1,5 @@
+google-genai
+mysql-connector-python
+streamlit
+python-dotenv
+pytest
