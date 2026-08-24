@@ -1,5 +1,5 @@
 from ui import (configurar_pagina, dibujar_sidebar, 
-                dibujar_chat_maqueta, dibujar_input_chat)
+                chat_conversacion, pregunta_chat_usuario)
 
 def main():
     # 1. Configuración de pantalla
@@ -7,8 +7,8 @@ def main():
     
     # 2. Dibujar componentes
     dibujar_sidebar()
-    dibujar_chat_maqueta()
-    dibujar_input_chat()
+    chat_conversacion()
+    pregunta_chat_usuario()
 
 if __name__ == "__main__":
     main()

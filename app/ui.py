@@ -1,4 +1,5 @@
 import streamlit as st
+from gemini_cliente import iniciar_chat, enviar_mensaje
 
 def configurar_pagina():
     st.set_page_config(
@@ -16,44 +17,41 @@ def dibujar_sidebar():
         st.divider()
         st.info("ℹ️ **Horario de atención:**\n\nLu -- Vie: 8:00 a.m. - 10:00 p.m.")
 
-def dibujar_chat_maqueta():
+def inicializar_sesion():
+    #Inicializa la sesión de Gemini si aún no existe.
+    if "chat" not in st.session_state:
+        st.session_state.chat = iniciar_chat()
+
+def chat_conversacion():
+
+    inicializar_sesion()
+
+    historial = st.session_state.chat.get_history()
+
     # Mensaje inicial del bot
-    with st.chat_message("asistente"):
-        st.write("Hola, ¿en qué puedo ayudarte hoy?")
-        st.write("Elige una opción: **Nuevo Pedido** o **Consultar Pedido**.")
+    if not historial:
+        with st.chat_message("assistant"):
+            st.write("Hola, ¿en qué puedo ayudarte hoy?")
+            st.write("Elige una opción: **Nuevo Pedido** o **Consultar Pedido**.")
 
-    # Mensajes de prueba del usuario
-    with st.chat_message("usuario"):
-        st.write("Quiero hacer un nuevo pedido")
+    # Muestra el historial
+    for message in historial:
+        role = "user" if message.role == "user" else "assistant"
+        #texto = "".join([part.text for part in message.parts if hasattr(part, "text") and part.text])
+        texto = ""
+        for part in message.parts:
+            # Verifica si la parte del mensaje contiene texto válido
+            if hasattr(part, "text") and part.text:
+                texto = texto + part.text
+        with st.chat_message(role):
+            st.markdown(texto)
 
-    with st.chat_message("usuario"):
-        st.write("¿Qué opciones tienes?")
+def pregunta_chat_usuario():
+    if prompt := st.chat_input("Escribe tu mensaje..."):
+        with st.chat_message("user"):
+            st.markdown(prompt)
 
-    # Respuesta del bot con catálogo estático
-    with st.chat_message("asistente"):
-        st.write("Claro, aquí tienes nuestro catálogo de recuerdos disponibles:")
-        
-        col1, col2, col3 = st.columns(3)
-        
-        with col1:
-            st.subheader("Marco con Foto y Nombre")
-            st.image("https://dummyimage.com/200x150/000/fff&text=Marco+Foto", caption="S/ 90")
-            st.write("Marco personalizable con foto y nombre.")
-            st.button("Elegir este producto", key="btn_p1")
-            
-        with col2:
-            st.subheader("Llavero Recuerdo")
-            st.image("https://dummyimage.com/200x150/000/fff&text=Llavero", caption="S/ 60")
-            st.write("Llavero con foto y grabado.")
-            st.button("Elegir este producto", key="btn_p2")
-            
-        with col3:
-            st.subheader("Collar con Placa")
-            st.image("https://dummyimage.com/200x150/000/fff&text=Collar", caption="S/ 50")
-            st.write("Collar personalizable con placa grabada.")
-            st.button("Elegir este producto", key="btn_p3")
-
-        st.write("Estas son todas nuestras opciones. ¿Cuál te interesa?")
-
-def dibujar_input_chat():
-    st.chat_input("Escribe tu mensaje...")
+        with st.chat_message("assistant"):
+            with st.spinner("Pensando..."):
+                respuesta = enviar_mensaje(st.session_state.chat, prompt)
+                st.markdown(respuesta)
