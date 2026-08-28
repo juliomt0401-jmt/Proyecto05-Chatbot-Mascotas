@@ -1,3 +1,8 @@
+from dotenv import load_dotenv
+
+# Carga las variables del .env una sola vez para toda la aplicación
+load_dotenv()
+
 from ui import (configurar_pagina, dibujar_sidebar, 
                 chat_conversacion, pregunta_chat_usuario)
 
