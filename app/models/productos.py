@@ -70,19 +70,29 @@ class Producto:
         return "\n".join(lista_productos)
 
 
-    def a_markdown(self) -> str:
-        #Devuelve la representación del producto formateada en Markdown para el chat.
-        #markdown_imagen = ""
-        #if self.imagen_url:
-        #    markdown_imagen = f"![{self.nombre}]({self.imagen_url})"
+    @classmethod
+    def obtener_producto_por_id(cls, producto_id: int):
+        db = BD()
+        sql = "SELECT * FROM productos WHERE ProductoID = %s"
+        recordset = db.ejecutar_SQL(sql, (producto_id,))
 
-        #return (
-        #    f"### {self.nombre} (`{self.codigo}`)\n"
-        #    f"{self.descripcion}\n\n"
-        #    f"**Precio:** S/ {self.precio:.2f}\n\n"
-        #    f"{markdown_imagen}\n"
-        #    f"---"
-        #)
+        if recordset:
+            f = recordset[0]
+            return cls(
+                producto_id=f["ProductoID"],
+                codigo=f["Codigo"],
+                categoria=f["Categoria"],
+                linea=f["Linea"],
+                nombre=f["Nombre"],
+                descripcion=f["Descripcion"],
+                precio=Decimal(str(f["Precio"])),
+                precio_mayorista=Decimal(str(f["PrecioMayorista"])),
+                imagen_url=f["ImagenURL"]
+            )
+        return None
+
+
+    def a_markdown(self) -> str:
 
         # Opción 1: Fijar un ancho en px
         imagen_html = (

@@ -14,10 +14,18 @@ if not api_key:
         api_key = None
 client = genai.Client(api_key=api_key)
 
+def mostrar_ficha_de_un_producto(producto_id: int) -> str:
+    #Busca un producto por su ID y devuelve la ficha técnica detallada en formato Markdown con imagen.
+    print(f">>> TOOL EJECUTADA: mostrar_ficha_de_un_producto con ID:{producto_id}")
+    prod = Producto.obtener_producto_por_id(producto_id)
+    if prod:
+        return prod.a_markdown()
+    return f"No se encontró ningún producto con el ID {producto_id}."
 
 def iniciar_chat():
 
     # 1. Obtener la lista de productos de MySQL
+    print(f">>> TOOL EJECUTADA: Obtener_catalogo_para_el_agente")
     catalogo_texto = Producto.Obtener_catalogo_para_el_agente()
     if catalogo_texto:
         texto_inventario = f"INVENTARIO REAL Y ÚNICO DISPONIBLE EN LA TIENDA:\n{catalogo_texto}"
@@ -45,6 +53,7 @@ def iniciar_chat():
         history=historial_base,
         config=types.GenerateContentConfig(
             system_instruction=SYSTEM_INSTRUCTION,
+            tools=[mostrar_ficha_de_un_producto],
         )
     )
 
