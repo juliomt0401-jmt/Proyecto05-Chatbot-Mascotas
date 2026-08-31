@@ -27,9 +27,13 @@ def mostrar_catalogo():
         texto_catalogo = "No se encontraron productos en el catálogo."
 
     # 2. Registrar la acción en el historial de Gemini para mantener el contexto
-    mensaje_solicitud = ("Muéstrame el catálogo completo de productos disponibles.")
-    st.session_state.chat.send_message(mensaje_solicitud)
-    st.session_state.chat.get_history()[-1].parts[0].text = texto_catalogo
+    #mensaje_solicitud = ("Muéstrame el catálogo completo de productos disponibles.")
+    #st.session_state.chat.send_message(mensaje_solicitud)
+    #st.session_state.chat.get_history()[-1].parts[0].text = texto_catalogo
+    #st.rerun()
+
+    #2. Registrar el catálogo para mostralo en la UI
+    st.session_state["catalogo_visible"] = texto_catalogo
     st.rerun()
 
 
@@ -65,6 +69,16 @@ def chat_conversacion():
                 texto = texto + part.text
         with st.chat_message(role):
             st.markdown(texto, unsafe_allow_html=True)
+
+    # Muestra el catálogo solicitado desde el botón
+    if "catalogo_visible" in st.session_state:
+        with st.chat_message("assistant"):
+            st.markdown(
+                st.session_state["catalogo_visible"],
+                unsafe_allow_html=True
+            )
+            st.write("Aquí tienes el catálogo disponible 🐾. Se mostrará solo en esta vista.")
+        del st.session_state["catalogo_visible"]
 
 def pregunta_chat_usuario():
     if prompt := st.chat_input("Escribe tu mensaje..."):
