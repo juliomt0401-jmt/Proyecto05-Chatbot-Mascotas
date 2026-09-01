@@ -7,6 +7,7 @@ from google.genai import errors
 from prompt import SYSTEM_INSTRUCTION
 from models.productos import Producto
 from models.pedidos import Pedidos
+from models.clientes  import Cliente
 
 # Inicializar cliente
 api_key = os.getenv("GEMINI_API_KEY")   # Local (.env)
@@ -36,6 +37,34 @@ def calcular_importe_pedido(items: list[dict[str, int]]) -> dict:
         "importe_pedido": "0.00",
         "Items": []
     }
+
+def verificar_cliente(dni: str) -> dict:
+    print(f">>> TOOL EJECUTADA: verificar_cliente con DNI: {dni}")
+    resultado = Cliente.verificar_cliente(dni)
+    return resultado
+
+def crear_cliente(datos_cliente: dict) -> dict:
+    # Recibe los datos del cliente en un json(DNI, Apellidos, Nombres, Telefono, eMail, Genero)
+    # y devuelve el ClienteID en un json
+
+    print(f">>> TOOL EJECUTADA: crear_cliente "
+          f"con datos: {datos_cliente}")
+
+    resultado = Cliente.crear_cliente(datos_cliente)
+
+    return resultado
+
+def modificar_cliente(datos_cliente: dict) -> dict:
+    # Recibe los datos del cliente en un json(ClienteID, DNI, Apellidos, Nombres, Telefono, eMail, Genero)
+    # y devuelve el ClienteID en un json
+
+    print(f">>> TOOL EJECUTADA: modificar_cliente "
+          f"con datos: {datos_cliente}")
+
+    resultado = Cliente.modificar_cliente(datos_cliente)
+
+    return resultado
+
 
 def iniciar_chat():
 
@@ -68,7 +97,11 @@ def iniciar_chat():
         history=historial_base,
         config=types.GenerateContentConfig(
             system_instruction=SYSTEM_INSTRUCTION,
-            tools=[mostrar_ficha_de_un_producto, calcular_importe_pedido],
+            tools=[mostrar_ficha_de_un_producto, 
+                   calcular_importe_pedido, 
+                   verificar_cliente,
+                   crear_cliente,
+                   modificar_cliente],
         )
     )
 
