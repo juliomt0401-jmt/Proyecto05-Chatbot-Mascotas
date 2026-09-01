@@ -25,7 +25,7 @@ class BD:
                 password=self.password,
                 database=self.database,
                 port=self.port,
-                ssl_disabled=ssl_disabled
+                ssl_disabled=False
             )
         except mysql.connector.Error as err:
             print(f"Error al conectar a la base de datos: {err}")
