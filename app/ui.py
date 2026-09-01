@@ -26,22 +26,27 @@ def mostrar_catalogo():
     else:
         texto_catalogo = "No se encontraron productos en el catálogo."
 
-    # 2. Registrar la acción en el historial de Gemini para mantener el contexto
-    #mensaje_solicitud = ("Muéstrame el catálogo completo de productos disponibles.")
-    #st.session_state.chat.send_message(mensaje_solicitud)
-    #st.session_state.chat.get_history()[-1].parts[0].text = texto_catalogo
-    #st.rerun()
-
     #2. Registrar el catálogo para mostralo en la UI
     st.session_state["catalogo_visible"] = texto_catalogo
     st.rerun()
 
+def nuevo_pedido():
+    inicializar_sesion()
+    enviar_mensaje(st.session_state.chat, "Quiero realizar un nuevo pedido")
+    st.rerun()
+
+def consultar_pedido():
+    inicializar_sesion()
+    enviar_mensaje(st.session_state.chat, "Quiero consultar un pedido")
+    st.rerun()
 
 def dibujar_sidebar():
     with st.sidebar:
         st.title("🐾 Recuerdos de Mascotas")
-        st.button("➕ Nuevo Pedido", use_container_width=True)
-        st.button("🔍 Consultar Pedido", use_container_width=True)
+        if st.button("➕ Nuevo Pedido", use_container_width=True):
+            nuevo_pedido()
+        if st.button("🔍 Consultar Pedido", use_container_width=True):
+            consultar_pedido()
         if st.button("📜 Ver Catálogo", use_container_width=True):
             mostrar_catalogo()
         st.divider()
@@ -67,8 +72,9 @@ def chat_conversacion():
             # Verifica si la parte del mensaje contiene texto válido
             if hasattr(part, "text") and part.text:
                 texto = texto + part.text
-        with st.chat_message(role):
-            st.markdown(texto, unsafe_allow_html=True)
+        if texto:
+            with st.chat_message(role):
+                st.markdown(texto, unsafe_allow_html=True)
 
     # Muestra el catálogo solicitado desde el botón
     if "catalogo_visible" in st.session_state:

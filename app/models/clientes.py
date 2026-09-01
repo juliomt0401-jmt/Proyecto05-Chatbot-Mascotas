@@ -48,6 +48,8 @@ class Cliente:
 
     @classmethod
     def crear_cliente(cls, datos_cliente: Dict[str, Any]) -> Dict[str, Any]:
+        xNombres = datos_cliente["Nombres"].strip().title()
+        xApellidos = datos_cliente["Apellidos"].strip().title()
         db = BD()
         sql = """
             INSERT INTO clientes (DNI, Apellidos, Nombres, Telefono, eMail, Genero)
@@ -58,8 +60,8 @@ class Cliente:
             sql,
             (
                 datos_cliente["DNI"],
-                datos_cliente["Apellidos"],
-                datos_cliente["Nombres"],
+                xApellidos,
+                xNombres,
                 datos_cliente["Telefono"],
                 datos_cliente["eMail"],
                 datos_cliente["Genero"]
@@ -72,6 +74,8 @@ class Cliente:
 
     @classmethod
     def modificar_cliente(cls, datos_cliente: Dict[str, Any]) -> Dict[str, Any]:
+        xNombres = datos_cliente["Nombres"].strip().title()
+        xApellidos = datos_cliente["Apellidos"].strip().title()
         db = BD()
         sql = """
             UPDATE clientes
@@ -86,8 +90,8 @@ class Cliente:
         filas_afectadas = db.actualizar_tabla(
             sql,
             (
-                datos_cliente["Apellidos"],
-                datos_cliente["Nombres"],
+                xApellidos,
+                xNombres,
                 datos_cliente["Genero"],
                 datos_cliente["DNI"],
                 datos_cliente["Telefono"],

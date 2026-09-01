@@ -46,25 +46,32 @@ def verificar_cliente(dni: str) -> dict:
 def crear_cliente(datos_cliente: dict) -> dict:
     # Recibe los datos del cliente en un json(DNI, Apellidos, Nombres, Telefono, eMail, Genero)
     # y devuelve el ClienteID en un json
-
     print(f">>> TOOL EJECUTADA: crear_cliente "
           f"con datos: {datos_cliente}")
-
     resultado = Cliente.crear_cliente(datos_cliente)
-
     return resultado
 
 def modificar_cliente(datos_cliente: dict) -> dict:
     # Recibe los datos del cliente en un json(ClienteID, DNI, Apellidos, Nombres, Telefono, eMail, Genero)
     # y devuelve el ClienteID en un json
-
     print(f">>> TOOL EJECUTADA: modificar_cliente "
           f"con datos: {datos_cliente}")
-
     resultado = Cliente.modificar_cliente(datos_cliente)
-
     return resultado
 
+def crear_pedido(datos_pedido: dict) -> dict:
+    print(f">>> TOOL EJECUTADA: crear_pedido "
+          f"con datos: {datos_pedido}")
+    resultado = Pedidos.crear_pedido(datos_pedido)
+    return resultado
+
+def consultar_pedido(datos_consulta: dict) -> dict:
+    print(
+        f">>> TOOL EJECUTADA: consultar_pedido "
+        f"con datos: {datos_consulta}"
+    )
+    resultado = Pedidos.consultar_pedido(datos_consulta)
+    return resultado
 
 def iniciar_chat():
 
@@ -101,7 +108,9 @@ def iniciar_chat():
                    calcular_importe_pedido, 
                    verificar_cliente,
                    crear_cliente,
-                   modificar_cliente],
+                   modificar_cliente,
+                   crear_pedido,
+                   consultar_pedido],
         )
     )
 

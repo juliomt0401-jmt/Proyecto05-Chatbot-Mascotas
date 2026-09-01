@@ -1,3 +1,4 @@
+import json
 import datetime
 from decimal import Decimal
 from typing import List, Dict, Any
@@ -32,12 +33,7 @@ class Pedidos:
         #    {
         #        "importe_pedido": str,
         #        "Items": [
-        #            {
-        #                "ProductoID": int,
-        #                "Cantidad": int,
-        #                "Precio": str,
-        #                "Importe": str
-        #            }
+        #            {"ProductoID": int, "Cantidad": int, "Precio": str, "Importe": str}
         #        ]
         #    }
         if not items:
@@ -94,4 +90,77 @@ class Pedidos:
         return {
             "importe_pedido": str(importe_pedido.quantize(Decimal("0.00"))),
             "Items": resultado_items
+        }
+
+    @classmethod
+    def crear_pedido(cls, datos_pedido: Dict[str, Any]) -> Dict[str, Any]:
+
+        # Crea el pedido invocando un procedimiento almacenado en la base de datos.
+        # Retorna PedidoID y Mensaje.
+        # Si PedidoID es 0, Mensaje indica el motivo del error.
+
+        importe_pedido = Decimal(datos_pedido["ImportePedido"])
+        items_json = json.dumps(datos_pedido["Items"],ensure_ascii=False)
+
+        db = BD()
+        resultado = db.ejecutar_SP("sp_crear_pedido", (datos_pedido["ClienteID"],
+                                                       datos_pedido["direccion_entrega"],
+                                                       importe_pedido,
+                                                       items_json)
+        )
+
+        if resultado:
+            return resultado
+
+        return {"PedidoID": 0,"Mensaje": "No se pudo crear el pedido."}
+
+    @classmethod
+    def consultar_pedido( cls, datos_consulta: Dict[str, Any]) -> Dict[str, Any]:
+
+        pedido_id = datos_consulta.get("PedidoID")
+        dni = datos_consulta.get("DNI")
+
+        sql = """
+            SELECT p.PedidoID, p.DireccionEntrega, p.Fecha, p.Estado, p.Importe AS ImportePedido,
+                   d.ProductoID, d.Cantidad, d.Precio, d.Importe AS ImporteItem
+            FROM pedidos p INNER JOIN clientes c
+            ON c.ClienteID = p.ClienteID INNER JOIN pedidosdetalle d
+            ON d.PedidoID = p.PedidoID
+            WHERE p.Estado NOT IN ('X', 'F')
+            AND ((%s IS NOT NULL AND p.PedidoID = %s) OR
+                 (%s IS NOT NULL AND c.DNI = %s))
+            ORDER BY p.Fecha DESC, p.PedidoID, d.ProductoID
+        """
+
+        db = BD()
+        recordset = db.ejecutar_SQL(sql, (pedido_id, pedido_id, dni, dni))
+
+        pedidos = {}
+        for fila in recordset:
+            id_pedido = fila["PedidoID"]
+
+            if id_pedido not in pedidos:
+                pedidos[id_pedido] = {
+                    "PedidoID": id_pedido,
+                    "DireccionEntrega": fila["DireccionEntrega"],
+                    "Fecha": fila["Fecha"],
+                    "Estado": fila["Estado"],
+                    "ImportePedido": str(fila["ImportePedido"]),
+                    "Items": []
+                }
+
+            pedidos[id_pedido]["Items"].append(
+                {"ProductoID": fila["ProductoID"], "Cantidad": fila["Cantidad"], 
+                 "Precio": str(fila["Precio"]), "Importe": str(fila["ImporteItem"])}
+            )
+
+        lista_pedidos = list(pedidos.values())
+
+        return {
+            "Pedidos": lista_pedidos,
+            "Mensaje": (
+                "Consulta realizada correctamente."
+                if lista_pedidos
+                else "No se encontraron pedidos."
+            )
         }

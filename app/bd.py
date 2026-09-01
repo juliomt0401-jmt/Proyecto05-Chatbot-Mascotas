@@ -77,3 +77,31 @@ class BD:
                 cursor.close()
             if conn and conn.is_connected():
                 conn.close()
+
+    def ejecutar_SP(self, nombre_sp: str, params: tuple = None) -> dict:
+
+        conn = None
+        cursor = None
+        try:
+            conn = self._conectar()
+            if conn is None:
+                return {}
+            cursor = conn.cursor(dictionary=True)
+            placeholders = ",".join(["%s"] * len(params or ()))
+            sql = f"CALL {nombre_sp}({placeholders})"
+            cursor.execute(sql, params or ())
+            recordset = cursor.fetchall()
+            if recordset:
+                return recordset[0]
+            return {}
+
+        except Exception as e:
+            print(f"Error al ejecutar SP: {e}")
+            print(f"sql: {nombre_sp}")
+            return {}
+
+        finally:
+            if cursor:
+                cursor.close()
+            if conn and conn.is_connected():
+                conn.close()
