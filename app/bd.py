@@ -9,7 +9,7 @@ class BD:
             self.user = os.getenv("DB_USER", "")
             self.password = os.getenv("DB_PASSWORD", "")
             self.database = os.getenv("DB_NAME", "")
-            self.port = os.getenv("DB_PORT", 0)
+            self.port = int(os.getenv("DB_PORT", 3306))
         else:
             self.host = st.secrets.get("DB_HOST")
             self.user = st.secrets.get("DB_USER")
@@ -25,6 +25,7 @@ class BD:
                 password=self.password,
                 database=self.database,
                 port=self.port,
+                ssl_disabled=ssl_disabled
             )
         except mysql.connector.Error as err:
             print(f"Error al conectar a la base de datos: {err}")
