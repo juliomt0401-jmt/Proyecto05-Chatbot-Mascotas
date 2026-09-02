@@ -10,6 +10,7 @@ class BD:
             self.password = os.getenv("DB_PASSWORD", "")
             self.database = os.getenv("DB_NAME", "")
             self.port = int(os.getenv("DB_PORT", 3306))
+            self.ssl_disabled = True
         else:
             st.write("Cargando credenciales de la base de datos desde Streamlit secrets...")
 
@@ -18,13 +19,7 @@ class BD:
             self.password = st.secrets.get("DB_PASSWORD")
             self.database = st.secrets.get("DB_NAME")
             self.port = int(st.secrets.get("DB_PORT"))
-
-            st.write(st.secrets.get("DB_HOST"), " : ", self.host)
-            st.write(st.secrets.get("DB_USER"), " : ", self.user)
-            st.write(st.secrets.get("DB_NAME"), " : ", self.database)
-            st.write(st.secrets.get("DB_PORT"), " : ", self.port)
-
-
+            self.ssl_disabled = False
 
     def _conectar(self):
         try:
@@ -34,7 +29,7 @@ class BD:
                 password=self.password,
                 database=self.database,
                 port=self.port,
-                ssl_disabled=False
+                ssl_disabled=self.ssl_disabled
             )
         except mysql.connector.Error as err:
             print(f"Error al conectar a la base de datos: {err}")
