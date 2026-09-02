@@ -11,11 +11,20 @@ class BD:
             self.database = os.getenv("DB_NAME", "")
             self.port = int(os.getenv("DB_PORT", 3306))
         else:
+            st.write("Cargando credenciales de la base de datos desde Streamlit secrets...")
+
             self.host = st.secrets.get("DB_HOST")
             self.user = st.secrets.get("DB_USER")
             self.password = st.secrets.get("DB_PASSWORD")
             self.database = st.secrets.get("DB_NAME")
             self.port = int(st.secrets.get("DB_PORT"))
+
+            st.write(st.secrets.get("DB_HOST"), " : ", self.host)
+            st.write(st.secrets.get("DB_USER"), " : ", self.user)
+            st.write(st.secrets.get("DB_NAME"), " : ", self.database)
+            st.write(st.secrets.get("DB_PORT"), " : ", self.port)
+
+
 
     def _conectar(self):
         try:
@@ -40,6 +49,17 @@ class BD:
             if conn is None:
                 return []
             cursor = conn.cursor(dictionary=True)
+
+            if conn is None:
+                st.write("❌ No se pudo conectar a MySQL")
+                return []
+
+            st.write("✅ Conexión MySQL OK")
+            st.write("Host:", self.host)
+            st.write("Base de datos:", self.database)
+            st.write("Puerto:", self.port)
+            st.write("SSL disabled:", self.ssl_disabled)
+
             cursor.execute(sql, params or ())
             return cursor.fetchall()
         except Exception as e:
