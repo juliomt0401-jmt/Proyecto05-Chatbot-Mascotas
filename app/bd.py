@@ -44,17 +44,6 @@ class BD:
             if conn is None:
                 return []
             cursor = conn.cursor(dictionary=True)
-
-            if conn is None:
-                st.write("❌ No se pudo conectar a MySQL")
-                return []
-
-            st.write("✅ Conexión MySQL OK")
-            st.write("Puerto:", self.port)
-            st.write("SSL disabled:", self.ssl_disabled)
-            st.write("sql:", sql)
-            st.write("parametros", params)
-
             cursor.execute(sql, params or ())
             return cursor.fetchall()
         except Exception as e:
