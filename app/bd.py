@@ -55,10 +55,10 @@ class BD:
                 return []
 
             st.write("✅ Conexión MySQL OK")
-            st.write("Host:", self.host)
-            st.write("Base de datos:", self.database)
             st.write("Puerto:", self.port)
             st.write("SSL disabled:", self.ssl_disabled)
+            st.write("sql:", sql)
+            st.write("parametros", params)
 
             cursor.execute(sql, params or ())
             return cursor.fetchall()
